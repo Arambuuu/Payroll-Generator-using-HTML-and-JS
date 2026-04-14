@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payslip Generator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #f4f2ee;
+        --surface: #ffffff;
+        --surface2: #f9f8f6;
+        --border: #e4e1d9;
+        --border2: #d4d0c8;
+        --text: #1a1917;
+        --text2: #6b6860;
+        --text3: #9e9c98;
+        --accent: #1a5c38;
+        --accent-light: #e8f2ec;
+        --accent2: #c8a84b;
+        --danger: #b84040;
+        --danger-light: #fdf0f0;
+        --radius: 10px;
+        --radius-lg: 16px;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      /* ── HEADER ── */
+      .app-header {
+        max-width: 1120px;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .app-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .app-logo-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .app-logo-icon svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: #fff;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .app-logo-name {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      .app-logo-sub {
+        font-size: 12px;
+        color: var(--text3);
+        font-family: "DM Mono", monospace;
+      }
+
+      /* ── LAYOUT ── */
+      .app-grid {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 20px;
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+      @media (max-width: 900px) {
+        .app-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── PANEL ── */
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+      .panel-head {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .panel-head-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .panel-head-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text2);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .panel-body {
+        padding: 20px;
+      }
+
+      /* ── FORM ELEMENTS ── */
+      .field-block {
+        margin-bottom: 14px;
+      }
+      .field-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 5px;
+        display: block;
+      }
+      .field-row {
+        display: grid;
+        gap: 8px;
+      }
+      .field-row.cols2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .field-row.cols3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        height: 36px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0 12px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+      input[type="text"]:focus,
+      input[type="number"]:focus {
+        border-color: var(--accent);
+        background: var(--surface);
+      }
+      input::placeholder {
+        color: var(--text3);
+      }
+
+      .section-sep {
+        height: 1px;
+        background: var(--border);
+        margin: 18px 0 14px;
+      }
+      .section-title {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 10px;
+      }
+
+      /* ── DYNAMIC ROWS ── */
+      .entries-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .entry-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        animation: slideIn 0.15s ease;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .entry-row input.label-input {
+        flex: 1;
+      }
+      .entry-row input.amount-input {
+        width: 110px;
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+      }
+      .remove-btn {
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text3);
+        font-size: 16px;
+        line-height: 1;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .remove-btn:hover {
+        background: var(--danger-light);
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      .add-row-btn {
+        width: 100%;
+        height: 32px;
+        margin-top: 6px;
+        border: 1px dashed var(--border2);
+        background: none;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        color: var(--text3);
+        transition: all 0.15s;
+      }
+      .add-row-btn:hover {
+        background: var(--surface2);
+        color: var(--text2);
+        border-color: var(--text3);
+      }
+
+      /* ── ACTION BUTTONS ── */
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
+      }
+      .btn {
+        height: 40px;
+        border-radius: var(--radius);
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.15s;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+      }
+      .btn-primary:hover {
+        opacity: 0.88;
+      }
+      .btn-secondary {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover {
+        background: var(--bg);
+      }
+      .btn svg {
+        width: 15px;
+        height: 15px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* ── PREVIEW ── */
+      .preview-bg {
+        background: var(--surface2);
+        border-radius: var(--radius);
+        padding: 20px;
+      }
+      .preview-copies {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 600px) {
+        .preview-copies {
+          grid-template-columns: 1fr;
+        }
+      }
+      .copy-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        text-align: center;
+        margin-bottom: 6px;
+      }
+
+      /* ── PAYSLIP CARD ── */
+      .slip {
+        background: #ffffff;
+        border: 1px solid #e0ddd6;
+        border-radius: 10px;
+        padding: 16px;
+        font-size: 11px;
+        color: #222;
+        font-family: "DM Sans", sans-serif;
+      }
+      .slip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #ece9e2;
+      }
+      .slip-company {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a5c38;
+        letter-spacing: -0.02em;
+      }
+      .slip-word {
+        font-size: 9px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 1px;
+      }
+      .slip-period {
+        text-align: right;
+        font-size: 10px;
+        color: #888;
+        font-family: "DM Mono", monospace;
+        line-height: 1.6;
+      }
+
+      .slip-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 12px;
+        background: #f9f8f6;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+      }
+      .slip-info-item {
+        font-size: 10px;
+        color: #888;
+      }
+      .slip-info-item strong {
+        display: block;
+        font-size: 11px;
+        color: #1a1917;
+        font-weight: 500;
+        margin-top: 1px;
+      }
+
+      .slip-section-title {
+        font-size: 9px;
+        font-weight: 500;
+        color: #1a5c38;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 5px;
+      }
+      .slip-lines {
+        margin-bottom: 6px;
+      }
+      .slip-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 3px 0;
+        font-size: 10.5px;
+        color: #444;
+        border-bottom: 1px solid #f2f0eb;
+      }
+      .slip-line:last-child {
+        border-bottom: none;
+      }
+      .slip-line .amount {
+        font-family: "DM Mono", monospace;
+        font-weight: 500;
+        color: #1a1917;
+      }
+
+      .slip-subtotal {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #888;
+        padding: 4px 0;
+        margin-bottom: 8px;
+      }
+      .slip-subtotal .amount {
+        font-family: "DM Mono", monospace;
+        color: #555;
+      }
+
+      .slip-net {
+        background: #1a5c38;
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+      }
+      .slip-net-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.75);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .slip-net-amount {
+        font-family: "DM Mono", monospace;
+        font-size: 16px;
+        font-weight: 500;
+        color: #ffffff;
+      }
+
+      .slip-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #ece9e2;
+        font-size: 9px;
+        color: #aaa;
+      }
+      .sig-line {
+        border-top: 1px solid #ccc;
+        padding-top: 3px;
+        text-align: center;
+        min-width: 80px;
+      }
+
+      /* ── PRINT ── */
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        body {
+          background: #fff;
+          padding: 0;
+          margin: 0;
+        }
+
+        .app-header,
+        .panel:first-child,
+        .panel-head,
+        .copy-label {
+          display: none !important;
+        }
+
+        .app-grid {
+          display: block;
+          max-width: none;
+        }
+
+        .panel:last-child {
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+        }
+
+        .panel-body {
+          padding: 10mm;
+        }
+
+        .preview-bg {
+          background: #fff;
+          padding: 0;
+        }
+
+        .preview-copies {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        @page {
+          size: A4 landscape;
+          margin: 10mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="app-logo">
+        <img
+          src="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png"
+          alt="Bridge logo"
+          style="height: 40px; width: auto; object-fit: contain"
+        />
+        <div>
+          <div class="app-logo-name">PaySlip</div>
+          <div class="app-logo-sub">generator</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-grid">
+      <!-- ── FORM PANEL ── -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-head-dot"></div>
+          <span class="panel-head-title">Payslip Details</span>
+        </div>
+        <div class="panel-body">
+          <div class="field-block">
+            <label class="field-label">Company name</label>
+            <input
+              type="text"
+              id="company"
+              placeholder="e.g. Bridge Corp"
+              value="Bridge Digital Transformations, Inc."
+            />
+          </div>
+
+          <div class="field-block">
+            <label class="field-label">Pay period</label>
+            <div class="field-row cols2">
+              <input
+                type="text"
+                id="periodFrom"
+                placeholder="From  e.g. Apr 1, 2026"
+              />
+              <input
+                type="text"
+                id="periodTo"
+                placeholder="To  e.g. Apr 15, 2026"
+              />
+            </div>
+          </div>
+
+          <div class="section-sep"></div>
+          <div class="section-title">Employee information</div>
+
+          <div class="field-block">
+            <label class="field-label">Full name</label>
+            <input type="text" id="empName" placeholder="e.g. Maria Santos" />
+          </div>
+
+          <div class="field-block">
+            <label class="field-label">Position & department</label>
+            <div class="field-row cols2">
+              <input type="text" id="empPos" placeholder="Position" />
+              <input type="text" id="empDept" placeholder="Department" />
+            </div>
+          </div>
+
+          <div class="field-block">
+            <label class="field-label">Employee ID & basic salary</label>
+            <div class="field-row cols2">
+              <input type="text" id="empId" placeholder="EMP-001" />
+              <input
+                type="number"
+                id="basicSalary"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+
+          <div class="section-sep"></div>
+          <div class="section-title">Earnings</div>
+
+          <div class="entries-list" id="earningsContainer"></div>
+          <button
+            class="add-row-btn"
+            onclick="addRow('earningsContainer', 'earning')"
+          >
+            + add earning
+          </button>
+
+          <div class="section-sep"></div>
+          <div class="section-title">Deductions</div>
+
+          <div class="entries-list" id="deductionsContainer"></div>
+          <button
+            class="add-row-btn"
+            onclick="addRow('deductionsContainer', 'deduction')"
+          >
+            + add deduction
+          </button>
+
+          <div class="actions">
+            <button class="btn btn-primary" onclick="window.print()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path
+                  d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"
+                />
+                <rect x="6" y="14" width="12" height="8" />
+              </svg>
+              Print payslip
+            </button>
+            <button class="btn btn-secondary" onclick="downloadPDF()">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PREVIEW PANEL ── -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-head-dot" style="background: var(--accent2)"></div>
+          <span class="panel-head-title">Live Preview</span>
+        </div>
+        <div class="panel-body" id="printArea">
+          <div class="preview-bg">
+            <div class="preview-copies">
+              <div>
+                <div class="copy-label">Employee copy</div>
+                <div class="slip" id="slip1"></div>
+              </div>
+              <div>
+                <div class="copy-label">Company copy</div>
+                <div class="slip" id="slip2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      function addRow(containerId, type) {
+        const c = $(containerId);
+        const div = document.createElement("div");
+        div.className = "entry-row";
+        const hint =
+          type === "earning" ? "e.g. Overtime pay" : "e.g. SSS contribution";
+        div.innerHTML = `
+    <input type="text" class="label-input" placeholder="${hint}" oninput="render()">
+    <input type="number" class="amount-input" placeholder="0.00" min="0" step="0.01" oninput="render()">
+    <button class="remove-btn" title="Remove" onclick="this.parentElement.remove();render()">×</button>`;
+        c.appendChild(div);
+        div.querySelector("input").focus();
+        render();
+      }
+
+      function fmt(n) {
+        return Number(n || 0).toLocaleString("en-PH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function buildSlipHTML() {
+        const company = $("company").value.trim() || "Company";
+        const from = $("periodFrom").value.trim() || "—";
+        const to = $("periodTo").value.trim() || "—";
+        const name = $("empName").value.trim() || "—";
+        const pos = $("empPos").value.trim() || "—";
+        const dept = $("empDept").value.trim() || "—";
+        const empId = $("empId").value.trim() || "—";
+        const basic = parseFloat($("basicSalary").value) || 0;
+
+        let totalEarnings = basic;
+        let earningsRows = `<div class="slip-line"><span>Basic salary</span><span class="amount">₱ ${fmt(basic)}</span></div>`;
+
+        document
+          .querySelectorAll("#earningsContainer .entry-row")
+          .forEach((row) => {
+            const label = row.querySelector(".label-input").value.trim();
+            const val =
+              parseFloat(row.querySelector(".amount-input").value) || 0;
+            if (label) {
+              earningsRows += `<div class="slip-line"><span>${label}</span><span class="amount">₱ ${fmt(val)}</span></div>`;
+              totalEarnings += val;
+            }
+          });
+
+        let totalDeductions = 0;
+        let deductionsRows = "";
+        document
+          .querySelectorAll("#deductionsContainer .entry-row")
+          .forEach((row) => {
+            const label = row.querySelector(".label-input").value.trim();
+            const val =
+              parseFloat(row.querySelector(".amount-input").value) || 0;
+            if (label) {
+              deductionsRows += `<div class="slip-line"><span>${label}</span><span class="amount">₱ ${fmt(val)}</span></div>`;
+              totalDeductions += val;
+            }
+          });
+        if (!deductionsRows) {
+          deductionsRows = `<div class="slip-line" style="color:#aaa;font-style:italic">No deductions</div>`;
+        }
+
+        const net = totalEarnings - totalDeductions;
+
+        return `
+    <div class="slip-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">
+          <img src="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png" alt="Logo" style="height:28px;width:auto;object-fit:contain;">
+          <div class="slip-company">${company}</div>
+        </div>
+        <div class="slip-word">Payslip</div>
+      </div>
+      <div class="slip-period">
+        <div>${from}</div>
+        <div>to ${to}</div>
+      </div>
+    </div>
+
+    <div class="slip-info">
+      <div class="slip-info-item">Name <strong>${name}</strong></div>
+      <div class="slip-info-item">ID <strong>${empId}</strong></div>
+      <div class="slip-info-item">Position <strong>${pos}</strong></div>
+      <div class="slip-info-item">Department <strong>${dept}</strong></div>
+    </div>
+
+    <div class="slip-section-title">Earnings</div>
+    <div class="slip-lines">${earningsRows}</div>
+    <div class="slip-subtotal">
+      <span>Gross earnings</span>
+      <span class="amount">₱ ${fmt(totalEarnings)}</span>
+    </div>
+
+    <div class="slip-section-title">Deductions</div>
+    <div class="slip-lines">${deductionsRows}</div>
+    <div class="slip-subtotal">
+      <span>Total deductions</span>
+      <span class="amount">₱ ${fmt(totalDeductions)}</span>
+    </div>
+
+    <div class="slip-net">
+      <div class="slip-net-label">Net pay</div>
+      <div class="slip-net-amount">₱ ${fmt(net)}</div>
+    </div>
+
+    <div class="slip-footer">
+      <div>Prepared by: Payroll In-Charge</div>
+      <div class="sig-line">Employee signature</div>
+    </div>`;
+      }
+
+      function render() {
+        const html = buildSlipHTML();
+        $("slip1").innerHTML = html;
+        $("slip2").innerHTML = html;
+      }
+
+      function downloadPDF() {
+        const el = $("printArea");
+        html2pdf()
+          .set({
+            margin: 8,
+            filename: "payslip.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+          })
+          .from(el)
+          .save();
+      }
+
+      [
+        "company",
+        "periodFrom",
+        "periodTo",
+        "empName",
+        "empPos",
+        "empDept",
+        "empId",
+        "basicSalary",
+      ].forEach((id) => {
+        const el = $(id);
+        if (el) el.addEventListener("input", render);
+      });
+
+      render();
+    </script>
+  </body>
+</html>
