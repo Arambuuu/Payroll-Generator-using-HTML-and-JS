@@ -9,7 +9,7 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    <style id="print-style"></style>
     <style>
       *,
       *::before,
@@ -18,7 +18,6 @@
         margin: 0;
         padding: 0;
       }
-
       :root {
         --bg: #f4f2ee;
         --surface: #ffffff;
@@ -36,7 +35,6 @@
         --radius: 10px;
         --radius-lg: 16px;
       }
-
       body {
         font-family: "DM Sans", sans-serif;
         background: var(--bg);
@@ -45,42 +43,14 @@
         padding: 24px;
       }
 
-      /* ── HEADER ── */
       .app-header {
-        max-width: 1120px;
+        max-width: 1200px;
         margin: 0 auto 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .app-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .app-logo-icon {
-        width: 36px;
-        height: 36px;
-        background: var(--accent);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .app-logo-icon svg {
-        width: 18px;
-        height: 18px;
-        fill: none;
-        stroke: #fff;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
       }
       .app-logo-name {
         font-size: 16px;
         font-weight: 600;
         letter-spacing: -0.02em;
-        color: var(--text);
       }
       .app-logo-sub {
         font-size: 12px;
@@ -88,12 +58,11 @@
         font-family: "DM Mono", monospace;
       }
 
-      /* ── LAYOUT ── */
       .app-grid {
         display: grid;
         grid-template-columns: 420px 1fr;
         gap: 20px;
-        max-width: 1120px;
+        max-width: 1200px;
         margin: 0 auto;
       }
       @media (max-width: 900px) {
@@ -102,7 +71,6 @@
         }
       }
 
-      /* ── PANEL ── */
       .panel {
         background: var(--surface);
         border: 1px solid var(--border);
@@ -133,7 +101,6 @@
         padding: 20px;
       }
 
-      /* ── FORM ELEMENTS ── */
       .field-block {
         margin-bottom: 14px;
       }
@@ -153,12 +120,11 @@
       .field-row.cols2 {
         grid-template-columns: 1fr 1fr;
       }
-      .field-row.cols3 {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
 
       input[type="text"],
-      input[type="number"] {
+      input[type="number"],
+      input[type="date"],
+      select {
         width: 100%;
         height: 36px;
         background: var(--surface2);
@@ -172,14 +138,55 @@
         transition:
           border-color 0.15s,
           background 0.15s;
+        appearance: none;
+        -webkit-appearance: none;
       }
       input[type="text"]:focus,
-      input[type="number"]:focus {
+      input[type="number"]:focus,
+      input[type="date"]:focus,
+      select:focus {
         border-color: var(--accent);
         background: var(--surface);
       }
       input::placeholder {
         color: var(--text3);
+      }
+      input[type="date"]::-webkit-datetime-edit {
+        color: var(--text);
+      }
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0.4;
+        cursor: pointer;
+      }
+
+      .select-wrap {
+        position: relative;
+      }
+      .select-wrap::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid var(--text3);
+      }
+
+      .paper-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10px;
+        font-family: "DM Mono", monospace;
+        color: var(--accent);
+        background: var(--accent-light);
+        border-radius: 4px;
+        padding: 1px 6px;
+        margin-left: 6px;
+        vertical-align: middle;
       }
 
       .section-sep {
@@ -196,7 +203,6 @@
         margin-bottom: 10px;
       }
 
-      /* ── DYNAMIC ROWS ── */
       .entries-list {
         display: flex;
         flex-direction: column;
@@ -247,7 +253,6 @@
         border-color: var(--danger);
         color: var(--danger);
       }
-
       .add-row-btn {
         width: 100%;
         height: 32px;
@@ -267,7 +272,6 @@
         border-color: var(--text3);
       }
 
-      /* ── ACTION BUTTONS ── */
       .actions {
         display: flex;
         flex-direction: column;
@@ -315,22 +319,22 @@
         stroke-linejoin: round;
       }
 
-      /* ── PREVIEW ── */
       .preview-bg {
         background: var(--surface2);
         border-radius: var(--radius);
         padding: 20px;
       }
-      .preview-copies {
+      #copiesGrid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
         gap: 16px;
+        grid-template-columns: 1fr 1fr;
       }
       @media (max-width: 600px) {
-        .preview-copies {
+        #copiesGrid {
           grid-template-columns: 1fr;
         }
       }
+
       .copy-label {
         font-size: 10px;
         font-weight: 500;
@@ -341,9 +345,8 @@
         margin-bottom: 6px;
       }
 
-      /* ── PAYSLIP CARD ── */
       .slip {
-        background: #ffffff;
+        background: #fff;
         border: 1px solid #e0ddd6;
         border-radius: 10px;
         padding: 16px;
@@ -379,7 +382,6 @@
         font-family: "DM Mono", monospace;
         line-height: 1.6;
       }
-
       .slip-info {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -400,7 +402,6 @@
         font-weight: 500;
         margin-top: 1px;
       }
-
       .slip-section-title {
         font-size: 9px;
         font-weight: 500;
@@ -428,7 +429,6 @@
         font-weight: 500;
         color: #1a1917;
       }
-
       .slip-subtotal {
         display: flex;
         justify-content: space-between;
@@ -441,7 +441,6 @@
         font-family: "DM Mono", monospace;
         color: #555;
       }
-
       .slip-net {
         background: #1a5c38;
         border-radius: 6px;
@@ -462,9 +461,8 @@
         font-family: "DM Mono", monospace;
         font-size: 16px;
         font-weight: 500;
-        color: #ffffff;
+        color: #fff;
       }
-
       .slip-footer {
         display: flex;
         justify-content: space-between;
@@ -480,83 +478,40 @@
         text-align: center;
         min-width: 80px;
       }
-
-      /* ── PRINT ── */
-      @media print {
-        * {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-
-        body {
-          background: #fff;
-          padding: 0;
-          margin: 0;
-        }
-
-        .app-header,
-        .panel:first-child,
-        .panel-head,
-        .copy-label {
-          display: none !important;
-        }
-
-        .app-grid {
-          display: block;
-          max-width: none;
-        }
-
-        .panel:last-child {
-          border: none;
-          border-radius: 0;
-          box-shadow: none;
-        }
-
-        .panel-body {
-          padding: 10mm;
-        }
-
-        .preview-bg {
-          background: #fff;
-          padding: 0;
-        }
-
-        .preview-copies {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-        }
-
-        @page {
-          size: A4 landscape;
-          margin: 10mm;
-        }
-      }
     </style>
   </head>
   <body>
     <header class="app-header">
-      <div class="app-logo">
-        <!-- <img
-          src="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png"
-          alt="Bridge logo"
-          style="height: 40px; width: auto; object-fit: contain"
-        /> -->
-        <div>
-          <div class="app-logo-name">PaySlip</div>
-          <div class="app-logo-sub">generator</div>
-        </div>
-      </div>
+      <div class="app-logo-name">PaySlip</div>
+      <div class="app-logo-sub">generator</div>
     </header>
 
     <div class="app-grid">
-      <!-- ── FORM PANEL ── -->
-      <div class="panel">
+      <div class="panel form-panel">
         <div class="panel-head">
           <div class="panel-head-dot"></div>
           <span class="panel-head-title">Payslip Details</span>
         </div>
         <div class="panel-body">
+          <div class="field-block">
+            <label class="field-label">
+              Paper size
+              <span class="paper-badge" id="paperBadge"
+                >A4 · Landscape · 2 copies</span
+              >
+            </label>
+            <div class="select-wrap">
+              <select id="paperSize">
+                <option value="a4">
+                  A4 (210 × 297 mm) — Landscape, 2 copies
+                </option>
+                <option value="long">
+                  Long Bond (216 × 330 mm) — Portrait, 4 copies
+                </option>
+              </select>
+            </div>
+          </div>
+
           <div class="field-block">
             <label class="field-label">Company name</label>
             <input
@@ -570,16 +525,8 @@
           <div class="field-block">
             <label class="field-label">Pay period</label>
             <div class="field-row cols2">
-              <input
-                type="text"
-                id="periodFrom"
-                placeholder="From  e.g. Apr 1, 2026"
-              />
-              <input
-                type="text"
-                id="periodTo"
-                placeholder="To  e.g. Apr 15, 2026"
-              />
+              <input type="date" id="periodFrom" />
+              <input type="date" id="periodTo" />
             </div>
           </div>
 
@@ -588,19 +535,42 @@
 
           <div class="field-block">
             <label class="field-label">Full name</label>
-            <input type="text" id="empName" placeholder="e.g. Maria Santos" />
+            <input
+              type="text"
+              id="empName"
+              list="nameList"
+              placeholder="Select or type name"
+            />
+            <datalist id="nameList">
+              <option value="Dennis Nazareno"></option>
+              <option value="Louwell Bernalte"></option>
+              <option value="Michael Joshua V. Ruña"></option>
+              <option value="Emil Gee Añasco"></option>
+              <option value="Justine De Juan"></option>
+              <option value="Ra Ashni Aram D. Piloto"></option>
+            </datalist>
           </div>
 
           <div class="field-block">
-            <label class="field-label">Position & department</label>
+            <label class="field-label">Position &amp; department</label>
             <div class="field-row cols2">
-              <input type="text" id="empPos" placeholder="Position" />
-              <input type="text" id="empDept" placeholder="Department" />
+              <input
+                type="text"
+                id="empPos"
+                placeholder="Position"
+                value="Web Developer"
+              />
+              <input
+                type="text"
+                id="empDept"
+                placeholder="Department"
+                value="BDTI"
+              />
             </div>
           </div>
 
           <div class="field-block">
-            <label class="field-label">Employee ID & basic salary</label>
+            <label class="field-label">Employee ID &amp; basic salary</label>
             <div class="field-row cols2">
               <input type="text" id="empId" placeholder="EMP-001" />
               <input
@@ -615,7 +585,6 @@
 
           <div class="section-sep"></div>
           <div class="section-title">Earnings</div>
-
           <div class="entries-list" id="earningsContainer"></div>
           <button
             class="add-row-btn"
@@ -626,7 +595,6 @@
 
           <div class="section-sep"></div>
           <div class="section-title">Deductions</div>
-
           <div class="entries-list" id="deductionsContainer"></div>
           <button
             class="add-row-btn"
@@ -636,7 +604,7 @@
           </button>
 
           <div class="actions">
-            <button class="btn btn-primary" onclick="window.print()">
+            <button class="btn btn-primary" onclick="printPayslip()">
               <svg viewBox="0 0 24 24">
                 <polyline points="6 9 6 2 18 2 18 9" />
                 <path
@@ -658,24 +626,14 @@
         </div>
       </div>
 
-      <!-- ── PREVIEW PANEL ── -->
-      <div class="panel">
+      <div class="panel preview-panel">
         <div class="panel-head">
           <div class="panel-head-dot" style="background: var(--accent2)"></div>
           <span class="panel-head-title">Live Preview</span>
         </div>
         <div class="panel-body" id="printArea">
           <div class="preview-bg">
-            <div class="preview-copies">
-              <div>
-                <div class="copy-label">Employee copy</div>
-                <div class="slip" id="slip1"></div>
-              </div>
-              <div>
-                <div class="copy-label">Company copy</div>
-                <div class="slip" id="slip2"></div>
-              </div>
-            </div>
+            <div id="copiesGrid"></div>
           </div>
         </div>
       </div>
@@ -684,19 +642,49 @@
     <script>
       const $ = (id) => document.getElementById(id);
 
-      function addRow(containerId, type) {
-        const c = $(containerId);
-        const div = document.createElement("div");
-        div.className = "entry-row";
-        const hint =
-          type === "earning" ? "e.g. Overtime pay" : "e.g. SSS contribution";
-        div.innerHTML = `
-    <input type="text" class="label-input" placeholder="${hint}" oninput="render()">
-    <input type="number" class="amount-input" placeholder="0.00" min="0" step="0.01" oninput="render()">
-    <button class="remove-btn" title="Remove" onclick="this.parentElement.remove();render()">×</button>`;
-        c.appendChild(div);
-        div.querySelector("input").focus();
-        render();
+      const PAPER = {
+        a4: {
+          badge: "A4 · Landscape · 2 copies",
+          copies: ["Employee copy", "Company copy"],
+          orientation: "landscape",
+          format: "a4",
+          pageCSS: "@page { size: A4 landscape; margin: 10mm; }",
+        },
+        long: {
+          badge: "Long Bond · Portrait · 4 copies",
+          copies: ["Employee copy", "Company copy", "HR copy", "Finance copy"],
+          orientation: "portrait",
+          format: [216, 330],
+          pageCSS: "@page { size: 216mm 330mm portrait; margin: 10mm; }",
+        },
+      };
+
+      function getPaper() {
+        return PAPER[$("paperSize").value] || PAPER.a4;
+      }
+
+      function applyPrintStyle() {
+        const p = getPaper();
+        $("print-style").textContent = `
+          @media print {
+            *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { background: #fff; padding: 0; margin: 0; }
+            .app-header, .form-panel, .copy-label, .panel-head { display: none !important; }
+            .app-grid { display: block; max-width: none; }
+            .preview-panel { border: none; border-radius: 0; }
+            .panel-body { padding: 6mm; }
+            .preview-bg { background: #fff; padding: 0; }
+            #copiesGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            ${p.pageCSS}
+          }
+        `;
+      }
+
+      /* Formatting Date as MM/DD/YYYY */
+      function formatDate(s) {
+        if (!s) return "—";
+        const [y, m, d] = s.split("-");
+        return `${m}/${d}/${y}`;
       }
 
       function fmt(n) {
@@ -706,10 +694,25 @@
         });
       }
 
+      function addRow(containerId, type) {
+        const c = $(containerId);
+        const div = document.createElement("div");
+        div.className = "entry-row";
+        const hint =
+          type === "earning" ? "e.g. Overtime pay" : "e.g. SSS contribution";
+        div.innerHTML = `
+          <input type="text"   class="label-input"  placeholder="${hint}"  oninput="render()">
+          <input type="number" class="amount-input" placeholder="0.00" min="0" step="0.01" oninput="render()">
+          <button class="remove-btn" title="Remove" onclick="this.parentElement.remove(); render()">×</button>`;
+        c.appendChild(div);
+        div.querySelector("input").focus();
+        render();
+      }
+
       function buildSlipHTML() {
         const company = $("company").value.trim() || "Company";
-        const from = $("periodFrom").value.trim() || "—";
-        const to = $("periodTo").value.trim() || "—";
+        const fromLabel = formatDate($("periodFrom").value);
+        const toLabel = formatDate($("periodTo").value);
         const name = $("empName").value.trim() || "—";
         const pos = $("empPos").value.trim() || "—";
         const dept = $("empDept").value.trim() || "—";
@@ -718,7 +721,6 @@
 
         let totalEarnings = basic;
         let earningsRows = `<div class="slip-line"><span>Basic salary</span><span class="amount">₱ ${fmt(basic)}</span></div>`;
-
         document
           .querySelectorAll("#earningsContainer .entry-row")
           .forEach((row) => {
@@ -731,8 +733,8 @@
             }
           });
 
-        let totalDeductions = 0;
-        let deductionsRows = "";
+        let totalDeductions = 0,
+          deductionsRows = "";
         document
           .querySelectorAll("#deductionsContainer .entry-row")
           .forEach((row) => {
@@ -744,94 +746,113 @@
               totalDeductions += val;
             }
           });
-        if (!deductionsRows) {
+        if (!deductionsRows)
           deductionsRows = `<div class="slip-line" style="color:#aaa;font-style:italic">No deductions</div>`;
-        }
 
         const net = totalEarnings - totalDeductions;
 
         return `
-    <div class="slip-header">
-      <div>
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">
-          <img src="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png" alt="Logo" style="height:28px;width:auto;object-fit:contain;">
-          <div class="slip-company">${company}</div>
-        </div>
-        <div class="slip-word">Payslip</div>
-      </div>
-      <div class="slip-period">
-        <div>${from}</div>
-        <div>to ${to}</div>
-      </div>
-    </div>
-
-    <div class="slip-info">
-      <div class="slip-info-item">Name <strong>${name}</strong></div>
-      <div class="slip-info-item">ID <strong>${empId}</strong></div>
-      <div class="slip-info-item">Position <strong>${pos}</strong></div>
-      <div class="slip-info-item">Department <strong>${dept}</strong></div>
-    </div>
-
-    <div class="slip-section-title">Earnings</div>
-    <div class="slip-lines">${earningsRows}</div>
-    <div class="slip-subtotal">
-      <span>Gross earnings</span>
-      <span class="amount">₱ ${fmt(totalEarnings)}</span>
-    </div>
-
-    <div class="slip-section-title">Deductions</div>
-    <div class="slip-lines">${deductionsRows}</div>
-    <div class="slip-subtotal">
-      <span>Total deductions</span>
-      <span class="amount">₱ ${fmt(totalDeductions)}</span>
-    </div>
-
-    <div class="slip-net">
-      <div class="slip-net-label">Net pay</div>
-      <div class="slip-net-amount">₱ ${fmt(net)}</div>
-    </div>
-
-    <div class="slip-footer">
-      <div>Prepared by: <strong>Maricel Lopez</strong></div>
-      <div class="sig-line">Employee signature</div>
-    </div>`;
+          <div class="slip-header">
+            <div>
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">
+                <img src="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png"
+                     alt="Logo" style="height:28px;width:auto;object-fit:contain;" crossorigin="anonymous">
+                <div class="slip-company">${company}</div>
+              </div>
+              <div class="slip-word">Payslip</div>
+            </div>
+            <div class="slip-period">${fromLabel} - ${toLabel}</div>
+          </div>
+          <div class="slip-info">
+            <div class="slip-info-item">Name <strong>${name}</strong></div>
+            <div class="slip-info-item">ID <strong>${empId}</strong></div>
+            <div class="slip-info-item">Position <strong>${pos}</strong></div>
+            <div class="slip-info-item">Department <strong>${dept}</strong></div>
+          </div>
+          <div class="slip-section-title">Earnings</div>
+          <div class="slip-lines">${earningsRows}</div>
+          <div class="slip-subtotal"><span>Gross earnings</span><span class="amount">₱ ${fmt(totalEarnings)}</span></div>
+          <div class="slip-section-title">Deductions</div>
+          <div class="slip-lines">${deductionsRows}</div>
+          <div class="slip-subtotal"><span>Total deductions</span><span class="amount">₱ ${fmt(totalDeductions)}</span></div>
+          <div class="slip-net">
+            <div class="slip-net-label">Net pay</div>
+            <div class="slip-net-amount">₱ ${fmt(net)}</div>
+          </div>
+          <div class="slip-footer">
+            <div>Prepared by: <strong>Maricel Lopez</strong></div>
+            <div class="sig-line">Employee signature</div>
+          </div>`;
       }
 
       function render() {
+        const p = getPaper();
         const html = buildSlipHTML();
-        $("slip1").innerHTML = html;
-        $("slip2").innerHTML = html;
+        const grid = $("copiesGrid");
+        grid.innerHTML = "";
+        p.copies.forEach((label) => {
+          const wrap = document.createElement("div");
+          wrap.innerHTML = `<div class="copy-label">${label}</div><div class="slip">${html}</div>`;
+          grid.appendChild(wrap);
+        });
+      }
+
+      function onPaperChange() {
+        $("paperBadge").textContent = getPaper().badge;
+        applyPrintStyle();
+        render();
+      }
+
+      function printPayslip() {
+        applyPrintStyle();
+        window.print();
       }
 
       function downloadPDF() {
+        const p = getPaper();
         const el = $("printArea");
         html2pdf()
           .set({
             margin: 8,
             filename: "payslip.pdf",
             image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+            html2canvas: { scale: 2, useCORS: true, allowTaint: false },
+            jsPDF: { unit: "mm", format: p.format, orientation: p.orientation },
           })
           .from(el)
           .save();
       }
 
-      [
-        "company",
-        "periodFrom",
-        "periodTo",
-        "empName",
-        "empPos",
-        "empDept",
-        "empId",
-        "basicSalary",
-      ].forEach((id) => {
-        const el = $(id);
-        if (el) el.addEventListener("input", render);
-      });
+      document.addEventListener("DOMContentLoaded", () => {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const last = String(
+          new Date(y, now.getMonth() + 1, 0).getDate(),
+        ).padStart(2, "0");
+        $("periodFrom").value = `${y}-${m}-01`;
+        $("periodTo").value = `${y}-${m}-${last}`;
 
-      render();
+        [
+          "company",
+          "periodFrom",
+          "periodTo",
+          "empName",
+          "empPos",
+          "empDept",
+          "empId",
+          "basicSalary",
+        ].forEach((id) => {
+          const el = $(id);
+          if (el) el.addEventListener("input", render);
+        });
+
+        $("paperSize").addEventListener("change", onPaperChange);
+
+        $("paperBadge").textContent = getPaper().badge;
+        applyPrintStyle();
+        render();
+      });
     </script>
   </body>
 </html>
