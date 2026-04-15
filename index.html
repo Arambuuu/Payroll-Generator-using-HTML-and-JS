@@ -325,7 +325,7 @@
       }
 
       .preview-bg {
-        background: var(--surface2);
+        /* background: var(--surface2); */
         border-radius: var(--radius);
         padding: 20px;
       }
@@ -482,6 +482,28 @@
         padding-top: 3px;
         text-align: center;
         min-width: 80px;
+      }
+      .pdf-mode {
+        background: #ffffff !important; /* or any color you want */
+      }
+
+      .pdf-mode .preview-bg {
+        background: #ffffff !important;
+      }
+
+      .pdf-mode .slip {
+        box-shadow: none !important;
+        border: 1px solid #ccc;
+      }
+      .pdf-mode #printArea {
+        background: #fff !important;
+        padding: 10px;
+      }
+      .pdf-mode,
+      .pdf-mode body,
+      .pdf-mode #printArea,
+      .pdf-mode .preview-bg {
+        background: #ffffff !important;
       }
     </style>
   </head>
@@ -671,18 +693,52 @@
       function applyPrintStyle() {
         const p = getPaper();
         $("print-style").textContent = `
-          @media print {
-            *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            body { background: #fff; padding: 0; margin: 0; }
-            .app-header, .form-panel, .copy-label, .panel-head { display: none !important; }
-            .app-grid { display: block; max-width: none; }
-            .preview-panel { border: none; border-radius: 0; }
-            .panel-body { padding: 6mm; }
-            .preview-bg { background: #fff; padding: 0; }
-            #copiesGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-            ${p.pageCSS}
-          }
-        `;
+    @media print {
+      html, body {
+        background: #ffffff !important; /* ✅ FORCE WHITE */
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .app-header,
+      .form-panel,
+      .copy-label,
+      .panel-head {
+        display: none !important;
+      }
+
+      .app-grid {
+        display: block;
+        max-width: none;
+        background: #ffffff !important; /* ✅ IMPORTANT */
+      }
+
+      .preview-panel,
+      #printArea,
+      .preview-bg {
+        background: #ffffff !important; /* ✅ REMOVE GRAY */
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      .panel-body {
+        padding: 6mm;
+      }
+
+      #copiesGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      ${p.pageCSS}
+    }
+  `;
       }
 
       /* Formatting Date as MM/DD/YYYY */
@@ -816,16 +872,26 @@
       function downloadPDF() {
         const p = getPaper();
         const el = $("printArea");
+
+        document.body.classList.add("pdf-mode");
+
         html2pdf()
           .set({
             margin: 8,
             filename: "payslip.pdf",
             image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, allowTaint: false },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              backgroundColor: "#ffffff", // ✅ THIS IS THE KEY FIX
+            },
             jsPDF: { unit: "mm", format: p.format, orientation: p.orientation },
           })
           .from(el)
-          .save();
+          .save()
+          .then(() => {
+            document.body.classList.remove("pdf-mode");
+          });
       }
 
       document.addEventListener("DOMContentLoaded", () => {
