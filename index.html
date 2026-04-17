@@ -546,12 +546,22 @@
 
           <div class="field-block">
             <label class="field-label">Company name</label>
-            <input
-              type="text"
-              id="company"
-              placeholder="e.g. Bridge Corp"
-              value="Bridge Digital Transformations, Inc."
-            />
+            <div class="select-wrap">
+              <select id="company">
+                <option
+                  value="Bridge Digital Transformations, Inc."
+                  data-logo="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png"
+                >
+                  Bridge Digital Transformations, Inc.
+                </option>
+                <option
+                  value="Mindanamics Corporation"
+                  data-logo="https://ik.imagekit.io/Araminbridge/BridgePRO/Mindanamics1.png?updatedAt=1776409947662"
+                >
+                  Mindanamics Corporation
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="field-block">
@@ -566,21 +576,22 @@
           <div class="section-title">Employee information</div>
 
           <div class="field-block">
-            <label class="field-label">Full name</label>
-            <input
-              type="text"
-              id="empName"
-              list="nameList"
-              placeholder="Select or type name"
-            />
-            <datalist id="nameList">
-              <option value="Dennis Nazareno"></option>
-              <option value="Louwell Bernalte"></option>
-              <option value="Michael Joshua V. Ruña"></option>
-              <option value="Emil Gee Añasco"></option>
-              <option value="Justine De Juan"></option>
-              <option value="Ra Ashni Aram D. Piloto"></option>
-            </datalist>
+            <label class="field-label">Name</label>
+            <div class="select-wrap">
+              <select id="empName">
+                <option value="" disabled selected>Select name</option>
+                <option value="Dennis Nazareno">Dennis Nazareno</option>
+                <option value="Louwell Bernalte">Louwell Bernalte</option>
+                <option value="Michael Joshua V. Ruña">
+                  Michael Joshua V. Ruña
+                </option>
+                <option value="Emil Gee Añasco">Emil Gee Añasco</option>
+                <option value="Justine De Juan">Justine De Juan</option>
+                <option value="Ra Ashni Aram D. Piloto">
+                  Ra Ashni Aram D. Piloto
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="field-block">
@@ -791,7 +802,15 @@
       }
 
       function buildSlipHTML() {
-        const company = $("company").value.trim() || "Company";
+        const companySelect = $("company");
+        const company = companySelect.value.trim() || "Company";
+
+        const selectedOption =
+          companySelect.options[companySelect.selectedIndex];
+        const logoUrl = selectedOption
+          ? selectedOption.getAttribute("data-logo") || ""
+          : "";
+
         const fromLabel = formatDate($("periodFrom").value);
         const toLabel = formatDate($("periodTo").value);
         const name = $("empName").value.trim() || "—";
@@ -851,7 +870,7 @@
           <div class="slip-header">
             <div>
               <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;">
-                <img src="https://ik.imagekit.io/Araminbridge/BridgePRO/Untitled%20design.png"
+                <img src="${logoUrl}"
                      alt="Logo" style="height:28px;width:auto;object-fit:contain;" crossorigin="anonymous">
                 <div class="slip-company">${company}</div>
               </div>
