@@ -125,6 +125,9 @@
       .field-row.cols2 {
         grid-template-columns: 1fr 1fr;
       }
+      .field-row.cols3-salary {
+        grid-template-columns: 1fr 80px 1fr;
+      }
 
       input[type="text"],
       input[type="number"],
@@ -232,6 +235,9 @@
       .entry-row input.label-input {
         flex: 1;
       }
+      .entry-row input.days-input {
+        width: 80px;
+      }
       .entry-row input.amount-input {
         width: 110px;
         font-family: "DM Mono", monospace;
@@ -325,7 +331,6 @@
       }
 
       .preview-bg {
-        /* background: var(--surface2); */
         border-radius: var(--radius);
         padding: 20px;
       }
@@ -448,7 +453,6 @@
       }
       .slip-net {
         background: #349083;
-
         border-radius: 6px;
         padding: 10px 12px;
         display: flex;
@@ -485,7 +489,7 @@
         min-width: 80px;
       }
       .pdf-mode {
-        background: #ffffff !important; /* or any color you want */
+        background: #ffffff !important;
       }
 
       .pdf-mode .preview-bg {
@@ -598,13 +602,22 @@
           </div>
 
           <div class="field-block">
-            <label class="field-label">Employee ID &amp; basic salary</label>
-            <div class="field-row cols2">
+            <label class="field-label"
+              >Emp ID, Days Rendered &amp; Basic Salary</label
+            >
+            <div class="field-row cols3-salary">
               <input type="text" id="empId" placeholder="EMP-001" />
               <input
                 type="number"
+                id="basicDays"
+                placeholder="Days"
+                min="0"
+                step="0.5"
+              />
+              <input
+                type="number"
                 id="basicSalary"
-                placeholder="0.00"
+                placeholder="Amount (0.00)"
                 min="0"
                 step="0.01"
               />
@@ -698,55 +711,54 @@
       function applyPrintStyle() {
         const p = getPaper();
         $("print-style").textContent = `
-    @media print {
-      html, body {
-        background: #ffffff !important; /* ✅ FORCE WHITE */
-        margin: 0 !important;
-        padding: 0 !important;
+        @media print {
+          html, body {
+            background: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .app-header,
+          .form-panel,
+          .copy-label,
+          .panel-head {
+            display: none !important;
+          }
+
+          .app-grid {
+            display: block;
+            max-width: none;
+            background: #ffffff !important;
+          }
+
+          .preview-panel,
+          #printArea,
+          .preview-bg {
+            background: #ffffff !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+
+          .panel-body {
+            padding: 6mm;
+          }
+
+          #copiesGrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
+
+          ${p.pageCSS}
+        }
+      `;
       }
 
-      * {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .app-header,
-      .form-panel,
-      .copy-label,
-      .panel-head {
-        display: none !important;
-      }
-
-      .app-grid {
-        display: block;
-        max-width: none;
-        background: #ffffff !important; /* ✅ IMPORTANT */
-      }
-
-      .preview-panel,
-      #printArea,
-      .preview-bg {
-        background: #ffffff !important; /* ✅ REMOVE GRAY */
-        border: none !important;
-        box-shadow: none !important;
-      }
-
-      .panel-body {
-        padding: 6mm;
-      }
-
-      #copiesGrid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-
-      ${p.pageCSS}
-    }
-  `;
-      }
-
-      /* Formatting Date as MM/DD/YYYY */
       function formatDate(s) {
         if (!s) return "—";
         const [y, m, d] = s.split("-");
@@ -764,10 +776,13 @@
         const c = $(containerId);
         const div = document.createElement("div");
         div.className = "entry-row";
-        const hint =
+
+        const labelHint =
           type === "earning" ? "e.g. Overtime pay" : "e.g. SSS contribution";
+
         div.innerHTML = `
-          <input type="text"   class="label-input"  placeholder="${hint}"  oninput="render()">
+          <input type="text"   class="label-input"  placeholder="${labelHint}"  oninput="render()">
+          <input type="text"   class="days-input"   placeholder="e.g. 1 day"    oninput="render()">
           <input type="number" class="amount-input" placeholder="0.00" min="0" step="0.01" oninput="render()">
           <button class="remove-btn" title="Remove" onclick="this.parentElement.remove(); render()">×</button>`;
         c.appendChild(div);
@@ -784,34 +799,49 @@
         const dept = $("empDept").value.trim() || "—";
         const empId = $("empId").value.trim() || "—";
         const basic = parseFloat($("basicSalary").value) || 0;
+        const basicDays = $("basicDays").value.trim();
 
         let totalEarnings = basic;
-        let earningsRows = `<div class="slip-line"><span>Basic salary</span><span class="amount">₱ ${fmt(basic)}</span></div>`;
+
+        // Include days for the basic salary if they provided a number
+        let basicLabel = basicDays
+          ? `Basic salary (${basicDays} days)`
+          : "Basic salary";
+        let earningsRows = `<div class="slip-line"><span>${basicLabel}</span><span class="amount">₱ ${fmt(basic)}</span></div>`;
+
         document
           .querySelectorAll("#earningsContainer .entry-row")
           .forEach((row) => {
             const label = row.querySelector(".label-input").value.trim();
+            const days = row.querySelector(".days-input").value.trim();
             const val =
               parseFloat(row.querySelector(".amount-input").value) || 0;
+
             if (label) {
-              earningsRows += `<div class="slip-line"><span>${label}</span><span class="amount">₱ ${fmt(val)}</span></div>`;
+              const displayLabel = days ? `${label} (${days})` : label;
+              earningsRows += `<div class="slip-line"><span>${displayLabel}</span><span class="amount">₱ ${fmt(val)}</span></div>`;
               totalEarnings += val;
             }
           });
 
         let totalDeductions = 0,
           deductionsRows = "";
+
         document
           .querySelectorAll("#deductionsContainer .entry-row")
           .forEach((row) => {
             const label = row.querySelector(".label-input").value.trim();
+            const days = row.querySelector(".days-input").value.trim();
             const val =
               parseFloat(row.querySelector(".amount-input").value) || 0;
+
             if (label) {
-              deductionsRows += `<div class="slip-line"><span>${label}</span><span class="amount">₱ ${fmt(val)}</span></div>`;
+              const displayLabel = days ? `${label} (${days})` : label;
+              deductionsRows += `<div class="slip-line"><span>${displayLabel}</span><span class="amount">₱ ${fmt(val)}</span></div>`;
               totalDeductions += val;
             }
           });
+
         if (!deductionsRows)
           deductionsRows = `<div class="slip-line" style="color:#aaa;font-style:italic">No deductions</div>`;
 
@@ -888,7 +918,7 @@
             html2canvas: {
               scale: 2,
               useCORS: true,
-              backgroundColor: "#ffffff", // ✅ THIS IS THE KEY FIX
+              backgroundColor: "#ffffff",
             },
             jsPDF: { unit: "mm", format: p.format, orientation: p.orientation },
           })
@@ -917,6 +947,7 @@
           "empPos",
           "empDept",
           "empId",
+          "basicDays",
           "basicSalary",
         ].forEach((id) => {
           const el = $(id);
