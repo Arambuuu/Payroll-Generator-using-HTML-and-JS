@@ -578,19 +578,21 @@
           <div class="field-block">
             <label class="field-label">Name</label>
             <div class="select-wrap">
-              <select id="empName">
-                <option value="" disabled selected>Select name</option>
-                <option value="Dennis Nazareno">Dennis Nazareno</option>
-                <option value="Louwell Bernalte">Louwell Bernalte</option>
-                <option value="Michael Joshua V. Ruña">
-                  Michael Joshua V. Ruña
-                </option>
-                <option value="Emil Gee Añasco">Emil Gee Añasco</option>
-                <option value="Justine De Juan">Justine De Juan</option>
-                <option value="Ra Ashni Aram D. Piloto">
-                  Ra Ashni Aram D. Piloto
-                </option>
-              </select>
+              <input
+                type="text"
+                id="empName"
+                list="employeeNames"
+                placeholder="Select or type employee name"
+              />
+              <datalist id="employeeNames">
+                <option value="Dennis Nazareno"></option>
+                <option value="Louwell Jay A. Bernalte"></option>
+                <option value="Michael Joshua V. Ruña"></option>
+                <option value="Emil Gee Añasco"></option>
+                <option value="Justine M. De Juan"></option>
+                <option value="Ra Ashni Aram D. Piloto"></option>
+                <option value="Maricel A. Lopez"></option>
+              </datalist>
             </div>
           </div>
 
