@@ -518,6 +518,33 @@
       <div class="app-logo-sub">generator</div>
     </header>
 
+    <!-- Datalists defined globally, outside any input -->
+    <datalist id="employeeNamesList">
+      <option value="Dennis Nazareno"></option>
+      <option value="Louwell Jay A. Bernalte"></option>
+      <option value="Michael Joshua V. Ruña"></option>
+      <option value="Emil Gee Añasco"></option>
+      <option value="Justine M. De Juan"></option>
+      <option value="Ra Ashni Aram D. Piloto"></option>
+      <option value="Maricel A. Lopez"></option>
+    </datalist>
+
+    <datalist id="employeePositionsList">
+      <option value="Web Developer"></option>
+      <option value="Accounting Staff"></option>
+      <option value="Project Manager"></option>
+      <option value="Sales Associate"></option>
+      <option value="UI/UX Designer"></option>
+      <option value="Backend Developer"></option>
+      <option value="Full Stack Developer"></option>
+      <option value="QA Engineer"></option>
+      <option value="DevOps Engineer"></option>
+      <option value="Business Analyst"></option>
+      <option value="HR Officer"></option>
+      <option value="Finance Officer"></option>
+      <option value="Operations Manager"></option>
+    </datalist>
+
     <div class="app-grid">
       <div class="panel form-panel">
         <div class="panel-head">
@@ -577,6 +604,7 @@
 
           <div class="field-block">
             <label class="field-label">Name</label>
+<<<<<<< Updated upstream
             <div class="select-wrap">
               <select id="empName">
                 <option value="" disabled selected>Select name</option>
@@ -592,16 +620,25 @@
                 </option>
               </select>
             </div>
+=======
+            <input
+              type="text"
+              id="empName"
+              list="employeeNamesList"
+              placeholder="Select or type employee name"
+            />
+>>>>>>> Stashed changes
           </div>
 
           <div class="field-block">
             <label class="field-label">Position &amp; department</label>
             <div class="field-row cols2">
+              <!-- Fixed: unique id, linked to correct datalist -->
               <input
                 type="text"
                 id="empPos"
+                list="employeePositionsList"
                 placeholder="Position"
-                value="Web Developer"
               />
               <input
                 type="text"
@@ -822,7 +859,6 @@
 
         let totalEarnings = basic;
 
-        // Include days for the basic salary if they provided a number
         let basicLabel = basicDays
           ? `Basic salary (${basicDays} days)`
           : "Basic salary";
