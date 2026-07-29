@@ -10,7 +10,7 @@
       type="image/x-icon"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link
@@ -28,22 +28,27 @@
         padding: 0;
       }
 
-      /* ── Light theme ── */
+      /* ── shadcn tokens — light ── */
       :root,
       [data-theme="light"] {
-        --bg: #f4f2ee;
-        --surface: #ffffff;
-        --surface2: #f9f8f6;
-        --border: #e4e1d9;
-        --border2: #d4d0c8;
-        --text: #1a1917;
-        --text2: #6b6860;
-        --text3: #9e9c98;
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+        --primary: 240 5.9% 10%;
+        --primary-foreground: 0 0% 98%;
+        --ring: 240 5.9% 10%;
+        --destructive: 0 62% 45%;
+        --destructive-light: 0 84% 96%;
+        --radius: 0.625rem;
+
+        /* payslip brand accents — kept distinct from app chrome */
         --accent: #1a5c38;
         --accent-light: #e8f2ec;
         --accent2: #c8a84b;
-        --danger: #b84040;
-        --danger-light: #fdf0f0;
         --slip-bg: #ffffff;
         --slip-border: #e0ddd6;
         --slip-info-bg: #f9f8f6;
@@ -51,27 +56,26 @@
         --slip-line-border: #f2f0eb;
         --slip-company-color: #1a5c38;
         --slip-net-bg: #349083;
-        --toggle-track: #d4d0c8;
-        --toggle-thumb: #fff;
-        --toggle-icon-sun: #c8a84b;
-        --toggle-icon-moon: #9e9c98;
       }
 
-      /* ── Dark theme ── */
+      /* ── shadcn tokens — dark ── */
       [data-theme="dark"] {
-        --bg: #111110;
-        --surface: #1c1b1a;
-        --surface2: #242321;
-        --border: #2e2d2b;
-        --border2: #3a3936;
-        --text: #f0ede8;
-        --text2: #a09d99;
-        --text3: #6b6860;
+        --background: 240 10% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 240 6% 10%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --ring: 240 4.9% 83.9%;
+        --destructive: 0 70% 55%;
+        --destructive-light: 0 40% 16%;
+
         --accent: #3aaa72;
         --accent-light: #0f2b1c;
         --accent2: #d4aa52;
-        --danger: #e05555;
-        --danger-light: #2a1515;
         --slip-bg: #1c1b1a;
         --slip-border: #2e2d2b;
         --slip-info-bg: #242321;
@@ -79,24 +83,53 @@
         --slip-line-border: #2a2927;
         --slip-company-color: #3aaa72;
         --slip-net-bg: #1e6b60;
-        --toggle-track: #3aaa72;
-        --toggle-thumb: #fff;
-        --toggle-icon-sun: #6b6860;
-        --toggle-icon-moon: #d4aa52;
       }
 
       body {
-        font-family: "DM Sans", sans-serif;
-        background: var(--bg);
-        color: var(--text);
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        background: hsl(var(--muted));
+        color: hsl(var(--foreground));
         min-height: 100vh;
-        padding: 24px;
-        transition:
-          background 0.25s,
-          color 0.25s;
+        padding: 0 0 24px;
+        transition: background 0.25s, color 0.25s;
+        -webkit-font-smoothing: antialiased;
       }
 
-      /* ── Theme toggle ── */
+      /* ── Navbar (matches app shell used across Bridge tools) ── */
+      .navbar {
+        border-bottom: 1px solid hsl(var(--border));
+        background: hsl(var(--card));
+        transition: background 0.25s, border-color 0.25s;
+        margin-bottom: 24px;
+      }
+      .navbar-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .navbar-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius);
+        background: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      /* ── Theme toggle (shadcn switch) ── */
       .theme-toggle {
         display: flex;
         align-items: center;
@@ -105,56 +138,44 @@
         user-select: none;
       }
       .theme-toggle .icon {
-        font-size: 14px;
-        transition: opacity 0.2s;
+        font-size: 13px;
+        color: hsl(var(--muted-foreground));
       }
       .toggle-track {
         position: relative;
         width: 36px;
         height: 20px;
-        background: var(--toggle-track);
+        background: hsl(var(--border));
         border-radius: 999px;
         transition: background 0.25s;
         flex-shrink: 0;
       }
+      [data-theme="dark"] .toggle-track {
+        background: hsl(var(--primary));
+      }
       .toggle-thumb {
         position: absolute;
-        top: 3px;
-        left: 3px;
-        width: 14px;
-        height: 14px;
-        background: var(--toggle-thumb);
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background: hsl(var(--card));
         border-radius: 50%;
         transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
       }
       [data-theme="dark"] .toggle-thumb {
         transform: translateX(16px);
       }
-      .sun-icon {
-        color: var(--toggle-icon-sun);
-      }
-      .moon-icon {
-        color: var(--toggle-icon-moon);
-      }
 
-      /* ── Header ── */
-      .app-header {
-        max-width: 1200px;
-        margin: 0 auto 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .app-logo-name {
-        font-size: 16px;
+      .navbar-title {
+        font-size: 14.5px;
         font-weight: 600;
-        letter-spacing: -0.02em;
+        color: hsl(var(--foreground));
       }
-      .app-logo-sub {
-        font-size: 12px;
-        color: var(--text3);
-        font-family: "DM Mono", monospace;
+      .navbar-sub {
+        font-size: 11.5px;
+        color: hsl(var(--muted-foreground));
       }
 
       .app-grid {
@@ -163,6 +184,7 @@
         gap: 20px;
         max-width: 1200px;
         margin: 0 auto;
+        padding: 0 24px;
       }
       @media (max-width: 900px) {
         .app-grid {
@@ -170,34 +192,34 @@
         }
       }
 
+      /* ── shadcn card / panel ── */
       .panel {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 16px;
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: calc(var(--radius) + 4px);
         overflow: hidden;
-        transition:
-          background 0.25s,
-          border-color 0.25s;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+        transition: background 0.25s, border-color 0.25s;
       }
       .panel-head {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--border);
+        padding: 14px 20px;
+        border-bottom: 1px solid hsl(var(--border));
         display: flex;
         align-items: center;
         gap: 8px;
         transition: border-color 0.25s;
       }
       .panel-head-dot {
-        width: 8px;
-        height: 8px;
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
         background: var(--accent);
         transition: background 0.25s;
       }
       .panel-head-title {
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 500;
-        color: var(--text2);
+        color: hsl(var(--muted-foreground));
         text-transform: uppercase;
         letter-spacing: 0.06em;
       }
@@ -209,12 +231,10 @@
         margin-bottom: 14px;
       }
       .field-label {
-        font-size: 11px;
+        font-size: 12.5px;
         font-weight: 500;
-        color: var(--text3);
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-bottom: 5px;
+        color: hsl(var(--foreground));
+        margin-bottom: 6px;
         display: block;
       }
       .field-row {
@@ -228,52 +248,52 @@
         grid-template-columns: 1fr 80px 1fr;
       }
 
+      /* ── shadcn inputs ── */
       input[type="text"],
       input[type="number"],
       input[type="date"],
       select {
         width: 100%;
         height: 36px;
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: 10px;
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--input));
+        border-radius: var(--radius);
         padding: 0 12px;
-        font-family: "DM Sans", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 13px;
-        color: var(--text);
+        color: hsl(var(--foreground));
         outline: none;
-        transition:
-          border-color 0.15s,
-          background 0.15s,
-          color 0.15s;
+        transition: border-color 0.15s, box-shadow 0.15s;
         appearance: none;
         -webkit-appearance: none;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.02);
       }
       input[type="text"]:focus,
       input[type="number"]:focus,
       input[type="date"]:focus,
       select:focus {
-        border-color: var(--accent);
-        background: var(--surface);
+        border-color: hsl(var(--ring));
+        box-shadow: 0 0 0 3px hsl(var(--ring) / 0.15);
       }
       input::placeholder {
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
       }
       input[type="date"]::-webkit-datetime-edit {
-        color: var(--text);
+        color: hsl(var(--foreground));
       }
       input[type="date"]::-webkit-calendar-picker-indicator {
-        opacity: 0.4;
+        opacity: 0.5;
         cursor: pointer;
-        filter: var(--date-icon-filter, none);
       }
-      [data-theme="dark"]
-        input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(0.7);
+      [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.85);
       }
 
       .select-wrap {
         position: relative;
+      }
+      .select-wrap select {
+        padding-right: 28px;
       }
       .select-wrap::after {
         content: "";
@@ -286,36 +306,34 @@
         height: 0;
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-top: 5px solid var(--text3);
+        border-top: 5px solid hsl(var(--muted-foreground));
       }
 
       .paper-badge {
         display: inline-flex;
         align-items: center;
-        font-size: 10px;
+        font-size: 10.5px;
         font-family: "DM Mono", monospace;
         color: var(--accent);
         background: var(--accent-light);
-        border-radius: 4px;
-        padding: 1px 6px;
+        border-radius: 999px;
+        padding: 2px 8px;
         margin-left: 6px;
         vertical-align: middle;
-        transition:
-          background 0.25s,
-          color 0.25s;
+        transition: background 0.25s, color 0.25s;
       }
 
       .section-sep {
         height: 1px;
-        background: var(--border);
+        background: hsl(var(--border));
         margin: 18px 0 14px;
       }
       .section-title {
         font-size: 11px;
-        font-weight: 500;
-        color: var(--text3);
+        font-weight: 600;
+        color: hsl(var(--muted-foreground));
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.07em;
         margin-bottom: 10px;
       }
 
@@ -352,43 +370,43 @@
         font-size: 12px;
       }
       .remove-btn {
-        width: 28px;
-        height: 28px;
-        border: 1px solid var(--border);
-        background: var(--surface2);
-        border-radius: 6px;
+        width: 30px;
+        height: 30px;
+        border: 1px solid hsl(var(--border));
+        background: hsl(var(--card));
+        border-radius: var(--radius);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--text3);
-        font-size: 16px;
+        color: hsl(var(--muted-foreground));
+        font-size: 15px;
         line-height: 1;
         flex-shrink: 0;
         transition: all 0.15s;
       }
       .remove-btn:hover {
-        background: var(--danger-light);
-        border-color: var(--danger);
-        color: var(--danger);
+        background: hsl(var(--destructive-light));
+        border-color: hsl(var(--destructive));
+        color: hsl(var(--destructive));
       }
       .add-row-btn {
         width: 100%;
         height: 32px;
         margin-top: 6px;
-        border: 1px dashed var(--border2);
+        border: 1px dashed hsl(var(--border));
         background: none;
-        border-radius: 10px;
+        border-radius: var(--radius);
         cursor: pointer;
-        font-family: "DM Sans", sans-serif;
-        font-size: 12px;
-        color: var(--text3);
+        font-family: "Inter", sans-serif;
+        font-size: 12.5px;
+        color: hsl(var(--muted-foreground));
         transition: all 0.15s;
       }
       .add-row-btn:hover {
-        background: var(--surface2);
-        color: var(--text2);
-        border-color: var(--text3);
+        background: hsl(var(--muted));
+        color: hsl(var(--foreground));
+        border-color: hsl(var(--muted-foreground));
       }
 
       .actions {
@@ -397,12 +415,12 @@
         gap: 8px;
         margin-top: 20px;
         padding-top: 18px;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid hsl(var(--border));
       }
       .btn {
-        height: 40px;
-        border-radius: 10px;
-        font-family: "DM Sans", sans-serif;
+        height: 38px;
+        border-radius: var(--radius);
+        font-family: "Inter", sans-serif;
         font-size: 13px;
         font-weight: 500;
         cursor: pointer;
@@ -411,22 +429,24 @@
         justify-content: center;
         gap: 8px;
         transition: all 0.15s;
+        border: 1px solid transparent;
       }
+      .btn:active { transform: translateY(0.5px); }
       .btn-primary {
-        background: #349083;
-        color: #fff;
+        background: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
         border: none;
       }
       .btn-primary:hover {
-        opacity: 0.88;
+        background: hsl(var(--primary) / 0.9);
       }
       .btn-secondary {
-        background: var(--surface2);
-        color: var(--text);
-        border: 1px solid var(--border);
+        background: hsl(var(--card));
+        color: hsl(var(--foreground));
+        border: 1px solid hsl(var(--border));
       }
       .btn-secondary:hover {
-        background: var(--bg);
+        background: hsl(var(--muted));
       }
       .btn svg {
         width: 15px;
@@ -456,26 +476,23 @@
       .copy-label {
         font-size: 10px;
         font-weight: 500;
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
         text-transform: uppercase;
         letter-spacing: 0.08em;
         text-align: center;
         margin-bottom: 6px;
       }
 
-      /* ── Slip styles — uses CSS vars so they adapt to dark mode ── */
+      /* ── Slip styles — the printed payslip keeps its own brand identity ── */
       .slip {
         background: var(--slip-bg);
         border: 1px solid var(--slip-border);
         border-radius: 10px;
         padding: 16px;
         font-size: 11px;
-        color: var(--text);
+        color: hsl(var(--foreground));
         font-family: "DM Sans", sans-serif;
-        transition:
-          background 0.25s,
-          border-color 0.25s,
-          color 0.25s;
+        transition: background 0.25s, border-color 0.25s, color 0.25s;
       }
       .slip-header {
         display: flex;
@@ -494,7 +511,7 @@
       }
       .slip-word {
         font-size: 9px;
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
         text-transform: uppercase;
         letter-spacing: 0.08em;
         margin-top: 1px;
@@ -502,7 +519,7 @@
       .slip-period {
         text-align: right;
         font-size: 10px;
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
         font-family: "DM Mono", monospace;
         line-height: 1.6;
       }
@@ -518,12 +535,12 @@
       }
       .slip-info-item {
         font-size: 10px;
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
       }
       .slip-info-item strong {
         display: block;
         font-size: 11px;
-        color: var(--text);
+        color: hsl(var(--foreground));
         font-weight: 500;
         margin-top: 1px;
       }
@@ -544,7 +561,7 @@
         justify-content: space-between;
         padding: 3px 0;
         font-size: 10.5px;
-        color: var(--text2);
+        color: hsl(var(--muted-foreground));
         border-bottom: 1px solid var(--slip-line-border);
       }
       .slip-line:last-child {
@@ -553,19 +570,19 @@
       .slip-line .amount {
         font-family: "DM Mono", monospace;
         font-weight: 500;
-        color: var(--text);
+        color: hsl(var(--foreground));
       }
       .slip-subtotal {
         display: flex;
         justify-content: space-between;
         font-size: 10px;
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
         padding: 4px 0;
         margin-bottom: 8px;
       }
       .slip-subtotal .amount {
         font-family: "DM Mono", monospace;
-        color: var(--text2);
+        color: hsl(var(--muted-foreground));
       }
       .slip-net {
         background: var(--slip-net-bg);
@@ -597,10 +614,10 @@
         padding-top: 8px;
         border-top: 1px solid var(--slip-header-border);
         font-size: 9px;
-        color: var(--text3);
+        color: hsl(var(--muted-foreground));
       }
       .sig-line {
-        border-top: 1px solid var(--border2);
+        border-top: 1px solid hsl(var(--border));
         padding-top: 3px;
         text-align: center;
         min-width: 80px;
@@ -624,25 +641,30 @@
     </style>
   </head>
   <body>
-    <header class="app-header">
-      <div>
-        <div class="app-logo-name">PaySlip</div>
-        <div class="app-logo-sub">generator</div>
-      </div>
-
-      <!-- Dark mode toggle -->
-      <label
-        class="theme-toggle"
-        title="Toggle dark mode"
-        onclick="toggleTheme()"
-      >
-        <span class="icon sun-icon"><i class="fa-regular fa-sun"></i></span>
-        <div class="toggle-track">
-          <div class="toggle-thumb"></div>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="navbar-brand">
+          <div class="navbar-mark">P</div>
+          <div>
+            <div class="navbar-title">Payslip Generator</div>
+            <div class="navbar-sub">Document generator</div>
+          </div>
         </div>
-        <span class="icon moon-icon"><i class="fa-regular fa-moon"></i></span>
-      </label>
-    </header>
+
+        <!-- Dark mode toggle -->
+        <label
+          class="theme-toggle"
+          title="Toggle dark mode"
+          onclick="toggleTheme()"
+        >
+          <span class="icon sun-icon"><i class="fa-regular fa-sun"></i></span>
+          <div class="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="icon moon-icon"><i class="fa-regular fa-moon"></i></span>
+        </label>
+      </div>
+    </div>
 
     <datalist id="employeeNamesList">
       <option value="Dennis Nazareno"></option>
@@ -888,7 +910,7 @@
         @media print {
           html, body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }
           * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          .app-header, .form-panel, .copy-label, .panel-head { display: none !important; }
+          .navbar, .form-panel, .copy-label, .panel-head { display: none !important; }
           .app-grid { display: block; max-width: none; background: #ffffff !important; }
           .preview-panel, #printArea, .preview-bg { background: #ffffff !important; border: none !important; box-shadow: none !important; }
           .panel-body { padding: 6mm; }
@@ -981,7 +1003,7 @@
           });
 
         if (!deductionsRows)
-          deductionsRows = `<div class="slip-line" style="color:var(--text3);font-style:italic">No deductions</div>`;
+          deductionsRows = `<div class="slip-line" style="color:hsl(var(--muted-foreground));font-style:italic">No deductions</div>`;
 
         const net = totalEarnings - totalDeductions;
 
